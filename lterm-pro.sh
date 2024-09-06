@@ -4,10 +4,7 @@
 RED='\033[1;91m'
 GREEN='\033[1;92m'
 YELLOW='\033[1;93m'
-BLUE='\033[1;94m'
-PURPLE='\033[1;95m'
 CYAN='\033[1;96m'
-WHITE='\033[1;97m'
 NC='\033[0m'  # No Color
 
 # --- Define log file for debugging ---
@@ -59,66 +56,42 @@ handle_choices() {
     local choice=$1
     case $choice in
         1) install_pkg "nmap";;
-        2)
-            echo -e "${GREEN}Installing netcat...${NC}"
-            if pkg install -y nmap-ncat; then
-                echo -e "${GREEN}netcat (nmap-ncat) installation complete.${NC}\n"
-            else
-                echo -e "${RED}Failed to install netcat (nmap-ncat).${NC}"
-            fi
-            ;;
+        2) install_pkg "nmap-ncat";;  # Netcat
         3) install_pkg "wget";;
         4) install_pkg "php";;
         5) install_pkg "curl";;
-        6) install_pkg "python" && install_pkg "python2";;
-        7)
-            if command -v lolcat &> /dev/null; then
-                echo -e "${GREEN}lolcat is already installed.${NC}"
-            else
-                echo -e "${YELLOW}lolcat not found, installing...${NC}"
-                install_pkg "ruby"
-                gem install lolcat
-                echo -e "${GREEN}lolcat installation complete.${NC}"
-            fi
-            ;;
-        8)
-            echo -e "${GREEN}Checking for Termux-speak repository...${NC}"
+        6) install_pkg "python" && install_pkg "python2" && install_pkg "python3";;
+        7) install_pkg "ruby" && gem install lolcat;;
+        8) # Clone Termux-speak repository
             if [ -d "core/Termux-speak" ]; then
-                echo -e "${YELLOW}Termux-speak repository found, pulling latest changes...${NC}"
                 cd core/Termux-speak && git pull origin master && cd ../..
             else
-                echo -e "${GREEN}Cloning Termux-speak repository...${NC}"
                 mkdir -p core && cd core
                 git clone https://github.com/TechnicalMujeeb/Termux-speak.git
-                cd Termux-speak
-                chmod +x *
-                cd ../..
-            fi
-            echo -e "${GREEN}Termux-speak setup complete.${NC}\n"
-            ;;
-        9)
-            if ! command -v git &> /dev/null; then
-                echo -e "${RED}Git is not installed. Installing Git...${NC}"
-                install_pkg "git"
-            fi
-
-            read -p "Enter the GitHub repository URL: " repo_url
-            if [[ ! -z "$repo_url" ]]; then
-                echo -e "${GREEN}Cloning repository from $repo_url...${NC}"
-                if git clone "$repo_url"; then
-                    echo -e "${GREEN}Repository cloned successfully.${NC}"
-                else
-                    echo -e "${RED}Failed to clone repository. Please check the URL or your connection.${NC}"
-                fi
-                read -p "Enter the directory name of the cloned repository to set permissions (or press Enter to skip): " repo_dir
-                if [[ ! -z "$repo_dir" && -d "$repo_dir" ]]; then
-                    chmod +x "$repo_dir"/*
-                    echo -e "${GREEN}Executable permissions set for $repo_dir.${NC}"
-                fi
-            else
-                echo -e "${YELLOW}No repository URL provided.${NC}\n"
+                cd Termux-speak && chmod +x * && cd ../..
             fi
             ;;
+        9) install_pkg "git";;
+        10) install_pkg "openssh";;
+        11) pkg install unstable-repo && install_pkg "";;
+        12) install_pkg "";;
+        13) install_pkg "htop";;
+        14) install_pkg "neofetch";;
+        15) install_pkg "nodejs";;
+        16) install_pkg "tmux";;
+        17) install_pkg "termux-api";;
+        18)
+    if [ -d "$HOME/storage" ]; then
+        echo -e "${YELLOW}~/storage already exists. Skipping storage setup.${NC}"
+    else
+        termux-setup-storage
+    fi
+    curl -L https://raw.githubusercontent.com/OzakIOne/termux-youtube-dl/v2.0.1/install.sh | bash
+    ;;
+        19) install_pkg "fzf";;
+        20) install_pkg "zsh";;
+        21) install_pkg "lynx";;
+        22) install_pkg "mc";;
         0) exit 0;;
         *)
             echo -e "${RED}Invalid option: $choice${NC}"
@@ -133,10 +106,23 @@ echo -e "2. Netcat"
 echo -e "3. Wget"
 echo -e "4. PHP"
 echo -e "5. Curl"
-echo -e "6. Python and Python2"
+echo -e "6. Python and Python2 & Python3(All)"
 echo -e "7. lolcat"
 echo -e "8. Termux-speak repository"
-echo -e "9. Custom GitHub repository"
+echo -e "9. Git"
+echo -e "10. OpenSSH"
+echo -e "11. Metasploit"
+echo -e "12. SQLmap"
+echo -e "13. htop"
+echo -e "14. Neofetch"
+echo -e "15. Node.js and npm"
+echo -e "16. Tmux"
+echo -e "17. Termux API"
+echo -e "18. YouTube-dl"
+echo -e "19. fzf (Fuzzy finder)"
+echo -e "20. Zsh (Differnt to Bash)"
+echo -e "21. Lynx (Text Based Browser)"
+echo -e "22. Mc"
 echo -e "0. Exit"
 
 read -p "Enter the number(s) of the tools you want to install, separated by spaces: " choices
